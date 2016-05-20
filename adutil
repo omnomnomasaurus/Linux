@@ -9,7 +9,7 @@ if [ $LOGNAME != "root" ] ; then
 fi
 
 clear
-echo "Nom's Ubuntu > Active Directory Script v1.0"
+echo "Nom's Ubuntu > Active Directory Script v1.01"
 sleep 1.5
 clear
 echo "INFORMATION! - This method of joining Linux Machines has only been successful on the following versions of Linux:"
@@ -85,7 +85,7 @@ function undo {
 }
 
 function confirmTicket {
-	clear
+
 	read -p "Has a ticket been recieved? y/n: " ticket
 
 		if [ $ticket == "y" ] ; then
@@ -133,7 +133,7 @@ function cont {
 
 function joinAndValidate {
 	echo
-	read -p "Domain Administrator account used to join domain (case sensitive): " domainAdmin
+	read -p "Domain Admin account for joining domain (case sensitive): " domainAdmin
 	read -p "Domain Name (all lowercase): " domainName
 
 	realm --verbose join -U $domainAdmin $domainName
