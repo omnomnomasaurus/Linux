@@ -81,6 +81,7 @@ function undo {
 			echo "Unknown paramter \"$retry\" - must be y/n";
 			sleep 1
 			undo
+		fi
 }
 
 function confirmTicket {
