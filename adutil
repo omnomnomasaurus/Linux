@@ -39,7 +39,7 @@ apt-get update -y
 clear
 echo "Installing necessary packages for Joining this machine to Windows Domain"
 sleep 0.5
-apt-get install realmd sssd samba-common samba-common-libs samba-libs sssd-tools krb5-user adcli packagekit vim -y
+apt-get install realmd sssd samba-common samba-common-bin samba-libs sssd-tools krb5-user adcli packagekit vim -y
 sleep 5
 clear
 echo "Necessary packages installed"
