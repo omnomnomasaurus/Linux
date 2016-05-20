@@ -20,12 +20,12 @@ echo
 echo "Attempting this on other versions of linux may not work and/or yeild unexpected results"
 echo "Proceed at your own discretion"
 
-sleep 6
+sleep 10
 
 clear
 
 echo "In order for this process to be successful, ensure that this computer is connected to both the internet and the network hosting the domain to be joined"
-sleep 3
+sleep 5
 clear
 
 echo "Updating apt..."
@@ -33,17 +33,17 @@ echo "Updating apt..."
 #************UPDATING APT AND INSTALLING REQUIRED PACKAGES************
 
 #Update Apt
-apt-get update -y
+apt-get update -y -qq
+echo "done..."
+sleep 1
 
 #install necessary packages
 clear
 echo "Installing necessary packages for Joining this machine to Windows Domain"
-sleep 0.5
-apt-get install realmd sssd samba-common samba-common-bin samba-libs sssd-tools krb5-user adcli packagekit vim -y
-sleep 5
-clear
+apt-get install realmd sssd samba-common samba-common-bin samba-libs sssd-tools krb5-user adcli packagekit vim -y -qq
+echo 
 echo "Necessary packages installed"
-sleep 0.5
+sleep 1
 
 #************ACQUIRING A KERBEROS TICKET************
 
@@ -55,7 +55,7 @@ echo "Presenting ticket to user:"
 echo
 klist
 
-sleep
+sleep 2
 echo
 
 function undo {
