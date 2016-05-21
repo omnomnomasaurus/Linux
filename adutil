@@ -173,7 +173,7 @@ apt-get update -y
 clear
 echo "Installing necessary packages for Joining this machine to Windows Domain"
 sleep 0.5
-apt-get install realmd sssd samba-common samba-common-libs samba-libs sssd-tools krb5-user adcli packagekit vim -y
+apt-get install realmd sssd samba-common samba-common-bin samba-libs sssd-tools krb5-user adcli packagekit vim -y
 
 clear
 echo "Necessary packages installed"
@@ -189,7 +189,7 @@ echo "Presenting ticket to user:"
 echo
 klist
 
-sleep
+sleep 1.5
 echo
 
 function undo {
@@ -215,6 +215,7 @@ function undo {
 			echo "Unknown paramter \"$retry\" - must be y/n";
 			sleep 1
 			undo
+		fi
 }
 
 function confirmTicket {
