@@ -65,7 +65,9 @@ function writeIP {
 
 	echo "Interfaces file written"
 	sleep 1
-
+	
+	mv /tmp/interfaces /etc/network/interfaces
+	
 	touch /bin/tempIP
 	
 	echo "System must reboot for changes to take place..."
