@@ -155,8 +155,10 @@ function confirmproxy {
 		echo "Unknown paramter '$retry' - must be y/n";
 		confirmproxy
 	fi
-	
 }
+
+readproxy
+confirmproxy
 
 #************DOMAIN RELATED STUFF************
 
