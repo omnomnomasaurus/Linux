@@ -157,8 +157,24 @@ function confirmproxy {
 	fi
 }
 
-readproxy
-confirmproxy
+read -p "Configure proxy settings? y/n: " pConfig
+
+function configProxy {
+	
+	if [ $pConfig == "y" ] ; then
+		readproxy
+		confirmproxy
+	elif [ $pConfig == "n" ] ; then
+		echo "Leaving Proxy Configuration...";
+		clear
+	elif [ -z $pConfig ] ; then
+		configproxy
+	else
+		echo "Unknown paramter \"$pConfig\" - must be y/n";
+		sleep 1
+	fi
+}
+configProxy
 
 #************DOMAIN RELATED STUFF************
 
