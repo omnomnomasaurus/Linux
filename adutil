@@ -2,14 +2,14 @@
 
 #check if the user is running as root
 #root is required to perform kerberos authentication and domain joining
-if [ $LOGNAME != "root" ] ; then
+if [ $USER != "root" ] ; then
 	echo "This script must be run as root user!";
 	echo "try 'sudo adutil' instead";
 	exit;
 fi
 
 clear
-echo "Nom's Ubuntu > Active Directory Script v1.01"
+echo "Nom's Ubuntu > Active Directory Script v1.02"
 sleep 1.5
 clear
 echo "INFORMATION! - This method of joining Linux Machines has only been successful on the following versions of Linux:"
@@ -20,30 +20,160 @@ echo
 echo "Attempting this on other versions of linux may not work and/or yeild unexpected results"
 echo "Proceed at your own discretion"
 
-sleep 10
+sleep 6
 
 clear
 
 echo "In order for this process to be successful, ensure that this computer is connected to both the internet and the network hosting the domain to be joined"
-sleep 5
+sleep 3
 clear
+
+#************IP CONFIGURATION RELATED STUFF************
+
+function acquire {
+	
+	echo "IPv4 Configuration:"
+	echo
+	read -p "IP Address: " address
+	read -p "Subnet Mask: " netmask
+	read -p "Default Gateway: " gateway
+	read -p "DNS Server Address: " nameserver
+	read -p "Search Domain (domain name): " search
+
+}
+
+function writeIP {
+	
+	file=/tmp/interfaces
+
+	touch $file
+	echo '# This file describes the network interfaces available on your system' >> $file
+	echo '# and how to activate them.  For more information, see interfaces(5).' >> $file
+	echo " " >> $file
+	echo '# The loopback network interface' >> $file
+	echo 'auto lo' >> $file
+	echo 'iface lo inet loopback' >> $file
+	echo " " >> $file
+	echo '# The primary network interface' >> $file
+	echo 'auto eth0' >> $file
+	echo 'iface eth0 inet static' >> $file
+	echo "	address $address" >> $file
+	echo "	netmask $netmask" >> $file
+	echo "	gateway $gateway" >> $file
+	echo "	dns-nameserver $nameserver" >> $file
+	echo "	dns-search $search" >> $file
+
+	echo "Interfaces file written"
+	sleep 1
+
+	touch /bin/tempIP
+	
+	echo "System must reboot for changes to take place..."
+	sleep 1	
+	reboot
+}
+
+function confirm {
+	
+	read -p "Is this configuration correct? y/n: " retry
+
+	if [ $retry == "y" ] ; then
+		clear
+		echo "Writing Interfaces File";
+		writeIP;
+	elif [ $retry == "n" ] ; then
+		clear;
+		acquire;
+	else
+		echo "Unknown paramter '$retry' - must be y/n";
+		confirm
+	fi
+	
+}
+
+function config {
+	
+	if [ $configIP == "y" ] ; then
+		acquire
+		confirm
+	elif [ $configIP == "n" ] ; then
+		echo "Leaving IPv4 Configuration...";
+		echo "NOTE: If IP settings are not configured properly, this process may not work."
+		clear
+	elif [ -z $configIP ] ; then
+		config
+	else
+		echo "Unknown paramter \"$configIP\" - must be y/n";
+		sleep 1
+	fi
+	
+}
+
+if [ -f /bin/tempIP ] ; then
+	echo "Recent IPv4 Modifications Discovered, Skipping IPv4 Configuration"
+	rm /bin/tempIP
+else
+	clear
+	read -p "Configure IPv4 settings? y/n: " configIP
+	config
+fi
+
+#************PROXY CONFUIGURATION TYPE STUFF************
+
+#read in user defined proxy configuration information
+function readproxy {
+	read -p "Proxy server address: " proxyaddr
+	read -p "Proxy port: " proxyport
+}
+
+function writeproxy {
+	echo "Acquire::http::proxy \"http://$proxyaddr:$proxyport/\";" >> /tmp/proxy.conf
+	echo "Acquire::https::proxy \"https://$proxyaddr:$proxyport/\";" >> /tmp/proxy.conf
+	mv /tmp/proxy.conf /etc/apt/apt.conf
+}
+
+function confirmproxy {
+	
+	read -p "Is this configuration correct? y/n: " retry
+
+	if [ $retry == "y" ] ; then
+		echo "Writing Proxy Information in '/etc/apt/apt.conf'";
+		writeproxy;
+		sleep 1
+		clear
+		echo "Written proxy information"
+		sleep 1
+		clear
+	elif [ $retry == "n" ] ; then
+		clear;
+		readproxy;
+	elif [ -z $retry ] ; then
+		confirmproxy
+	else
+		echo "Unknown paramter '$retry' - must be y/n";
+		confirmproxy
+	fi
+	
+}
+
+#************DOMAIN RELATED STUFF************
 
 echo "Updating apt..."
 
 #************UPDATING APT AND INSTALLING REQUIRED PACKAGES************
 
 #Update Apt
-apt-get update -y -qq
-echo "done..."
-sleep 1
+apt-get update -y
 
 #install necessary packages
 clear
 echo "Installing necessary packages for Joining this machine to Windows Domain"
-apt-get install realmd sssd samba-common samba-common-bin samba-libs sssd-tools krb5-user adcli packagekit vim -y -qq
-echo 
+sleep 0.5
+apt-get install realmd sssd samba-common samba-common-libs samba-libs sssd-tools krb5-user adcli packagekit vim -y
+
+clear
 echo "Necessary packages installed"
-sleep 1
+sleep 0.5
 
 #************ACQUIRING A KERBEROS TICKET************
 
@@ -55,7 +185,7 @@ echo "Presenting ticket to user:"
 echo
 klist
 
-sleep 2
+sleep
 echo
 
 function undo {
@@ -81,11 +211,10 @@ function undo {
 			echo "Unknown paramter \"$retry\" - must be y/n";
 			sleep 1
 			undo
-		fi
 }
 
 function confirmTicket {
-
+	clear
 	read -p "Has a ticket been recieved? y/n: " ticket
 
 		if [ $ticket == "y" ] ; then
@@ -133,7 +262,7 @@ function cont {
 
 function joinAndValidate {
 	echo
-	read -p "Domain Admin account for joining domain (case sensitive): " domainAdmin
+	read -p "Domain Administrator account used to join domain (case sensitive): " domainAdmin
 	read -p "Domain Name (all lowercase): " domainName
 
 	realm --verbose join -U $domainAdmin $domainName
@@ -196,5 +325,4 @@ echo "Domain users are now able to login to this machine"
 echo "Finishing..."
 
 exit
-
 
