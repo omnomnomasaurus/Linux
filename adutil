@@ -330,7 +330,7 @@ clear
 
 #modify /etc/pam.d/common-session to auto-create a home directory for domain users at logon
 function modCommonSession {
-	echo 'session_required pam_mkhomedir.so skel=/etc/skel umask=0022' >> /etc/pam.d/common-session
+	echo 'session required pam_mkhomedir.so skel=/etc/skel/ umask=0022' >> /etc/pam.d/common-session
 }
 
 modCommonSession
