@@ -309,11 +309,11 @@ joinAndValidate
 clear
 function modsssdConf {
 	echo "ad_hostname = $(hostname).$(realm -n list)" >> /etc/sssd/sssd.conf
-	echo "dyndns_update = true"
+	echo "dyndns_update = true" >> /etc/sssd/sssd.conf
 }
 
 clear
-echo "Modyfing /etc/apt/apt.conf, including Domain DNS settings"
+echo "Modyfing /etc/sssd/sssd.conf, including Domain DNS settings"
 modsssdConf
 sleep 1.5
 echo "done...."
